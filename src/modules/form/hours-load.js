@@ -4,21 +4,27 @@ import { hoursClick } from "./hours-click.js";
 
 const hours = document.getElementById("hours");
 
-export function hoursLoad({ date }) {
+export function hoursLoad({ date, dailySchedules }) {
     hours.innerHTML = "";
 
+    const unavailableHours = dailySchedules.map((schedule) =>
+        dayjs(schedule.when).format("HH:mm")
+    );
+
     const opening = openingHours.map((hour) => {
-        // Get the hours (9:00 split to 9)
+        // Get hours (9:00 split to 9)
         const [scheduleHour] = hour.split(":");
 
         // Verify if the time is in the past
         const isHourPast = dayjs(date)
             .add(scheduleHour, "hour")
-            .isAfter(dayjs());
+            .isBefore(dayjs());
+
+        const available = !unavailableHours.includes(hour) && !isHourPast;
 
         return {
             hour,
-            available: isHourPast,
+            available,
         };
     });
 
